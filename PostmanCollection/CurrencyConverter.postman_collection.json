@@ -1,0 +1,435 @@
+{
+  "info": {
+    "_postman_id": "e23970f5-a773-45a1-9e91-818de4b7a12e",
+    "name": "CurrencyConverter",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "2420568"
+  },
+  "item": [
+    {
+      "name": "api",
+      "item": [
+        {
+          "name": "ExchangeRate",
+          "item": [
+            {
+              "name": "GetLatestExchangeRate",
+              "item": [
+                {
+                  "name": "/api/ExchangeRate/GetLatestExchangeRate",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRJZCI6IjEwMDEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4iLCJleHAiOjE3NzA5MTU0OTUsImlzcyI6IkN1cnJlbmN5QXBwIiwiYXVkIjoiQ3VycmVuY3lBcHBVc2VycyJ9.fp0Zo3qPacu-BXWUoHD-URPf8zig0bL9b0SrtrIctJs",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/ExchangeRate/GetLatestExchangeRate?baseCurrency=EUR",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "ExchangeRate",
+                        "GetLatestExchangeRate"
+                      ],
+                      "query": [
+                        {
+                          "key": "baseCurrency",
+                          "value": "EUR"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/ExchangeRate/GetLatestExchangeRate?baseCurrency=EUR",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "ExchangeRate",
+                            "GetLatestExchangeRate"
+                          ],
+                          "query": [
+                            {
+                              "key": "baseCurrency",
+                              "value": "EUR"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "GetSupportedCurrencies",
+              "item": [
+                {
+                  "name": "/api/ExchangeRate/GetSupportedCurrencies",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/ExchangeRate/GetSupportedCurrencies",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "ExchangeRate",
+                        "GetSupportedCurrencies"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/ExchangeRate/GetSupportedCurrencies",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "ExchangeRate",
+                            "GetSupportedCurrencies"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ConvertCurrency",
+              "item": [
+                {
+                  "name": "/api/ExchangeRate/ConvertCurrency",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/ExchangeRate/ConvertCurrency?fromCurrency=USD&toCurrency=INR",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "ExchangeRate",
+                        "ConvertCurrency"
+                      ],
+                      "query": [
+                        {
+                          "key": "fromCurrency",
+                          "value": "USD"
+                        },
+                        {
+                          "key": "toCurrency",
+                          "value": "INR"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/ExchangeRate/ConvertCurrency?fromCurrency=string&toCurrency=string",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "ExchangeRate",
+                            "ConvertCurrency"
+                          ],
+                          "query": [
+                            {
+                              "key": "fromCurrency",
+                              "value": "string"
+                            },
+                            {
+                              "key": "toCurrency",
+                              "value": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "GetHistoricalExchangeRates",
+              "item": [
+                {
+                  "name": "/api/ExchangeRate/GetHistoricalExchangeRates",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"baseCurrency\": \"INR\",\n  \"fromDate\": \"2026-01-01\",\n  \"toDate\": \"2026-02-01\",\n  \"pageNumber\": 1,\n  \"records\": 10\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/api/ExchangeRate/GetHistoricalExchangeRates",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "ExchangeRate",
+                        "GetHistoricalExchangeRates"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"baseCurrency\": \"string\",\n  \"fromDate\": \"1969-07-28T19:29:27.833Z\",\n  \"toDate\": \"2003-02-06T23:30:50.297Z\",\n  \"pageNumber\": 9843,\n  \"records\": 7476\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/ExchangeRate/GetHistoricalExchangeRates",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "ExchangeRate",
+                            "GetHistoricalExchangeRates"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "item": [
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "let response = pm.response.json();\r",
+                      "\r",
+                      "pm.environment.set(\"token\", response.access_token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/Auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "Auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WeatherForecast",
+      "item": [
+        {
+          "name": "Get Weather Forecast",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/WeatherForecast",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "WeatherForecast"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "text/plain"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/WeatherForecast",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "WeatherForecast"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"date\": {\n      \"year\": 5708,\n      \"month\": 3963,\n      \"day\": 1254,\n      \"dayOfWeek\": 6,\n      \"dayOfYear\": 9059,\n      \"dayNumber\": 822\n    },\n    \"temperatureC\": 246,\n    \"temperatureF\": 3880,\n    \"summary\": \"string\"\n  },\n  {\n    \"date\": {\n      \"year\": 5487,\n      \"month\": 3075,\n      \"day\": 7321,\n      \"dayOfWeek\": 5,\n      \"dayOfYear\": 1068,\n      \"dayNumber\": 6266\n    },\n    \"temperatureC\": 8044,\n    \"temperatureF\": 3498,\n    \"summary\": \"string\"\n  }\n]"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "/"
+    }
+  ]
+}
