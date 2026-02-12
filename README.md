@@ -23,3 +23,25 @@ username: admin
 password: 123
 
 Upon successful authentication, an access token will be generated. The token is automatically stored in the Postman environment and applied to all subsequent API requests in the collection.
+
+# Deployment Strategy
+
+To support deployments across multiple environments, the repository uses dedicated branches:
+
+dev — development environment
+
+qa — quality assurance testing
+
+uat — user acceptance testing
+
+master — production
+
+Each environment should be deployed from its corresponding branch to ensure proper isolation, testing, and release control.
+
+# Environment Configuration
+
+The Currency Converter API base URL is stored in appsettings.json.
+
+This value can be parameterized through CI/CD pipelines, allowing environment-specific configuration without modifying source code.
+
+Each environment (dev, qa, uat, production) can use its own API endpoint.
