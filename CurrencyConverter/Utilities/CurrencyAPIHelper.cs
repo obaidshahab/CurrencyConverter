@@ -12,11 +12,14 @@ namespace CurrencyConverter.Utilities
     {
         private readonly ILogger<CurrencyAPIHelper> _logger;
         private readonly ICacheHelper _cache;
-        string baseUrl = "https://api.frankfurter.dev/v1/";
-        public CurrencyAPIHelper(ILogger<CurrencyAPIHelper> logger, ICacheHelper cache)
+        private readonly IConfiguration _config;
+        string baseUrl = string.Empty;
+        public CurrencyAPIHelper(ILogger<CurrencyAPIHelper> logger, ICacheHelper cache, IConfiguration config)
         {
             _logger = logger;
             _cache = cache;
+            _config=config;
+            baseUrl = _config.GetSection("CurrencyProvider")["BaseUrl"];
         }
         public async Task<CurrencyAPIModel> GetExchangeRates(string baseCurrency)
         {
