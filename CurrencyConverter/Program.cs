@@ -2,9 +2,13 @@
 using CurrencyConverter.Middleware;
 using CurrencyConverter.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using Polly.Extensions.Http;
+using Polly;
 using Serilog;
 using System.Text;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +24,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    //Added below code to check if it fails to authenticate
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -28,6 +33,7 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+    // JWT Token validation
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -43,9 +49,10 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers(options =>
 {
-    
+
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -60,8 +67,50 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<ICurrencyAPIHelper, CurrencyAPIHelper>();
 builder.Services.AddSingleton<ICacheHelper, CacheHelper>();
- 
+
 builder.Services.AddScoped<JwtService>();
+
+// Applly rate limit
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("default", config =>
+    {
+        config.PermitLimit = 10; 
+        config.Window = TimeSpan.FromMinutes(1);
+        config.QueueLimit = 10;
+    });
+});
+// Add Retry Policy
+static IAsyncPolicy<HttpResponseMessage> RetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError() // 5xx + network errors + 408
+        .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests) 
+        .WaitAndRetryAsync(
+            3,
+            retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) // 2s, 4s, 8s
+        );
+}
+
+// Added Circuit Breaker
+static IAsyncPolicy<HttpResponseMessage> CircuitBreakerPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .CircuitBreakerAsync(
+            handledEventsAllowedBeforeBreaking: 5,
+            durationOfBreak: TimeSpan.FromSeconds(30)
+        );
+}
+
+builder.Services.AddHttpClient("ExternalApi", client =>
+{
+        client.Timeout = TimeSpan.FromSeconds(30);
+})
+.AddPolicyHandler(RetryPolicy())
+.AddPolicyHandler(CircuitBreakerPolicy());
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,6 +119,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// Register global exceptions
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 
@@ -77,6 +128,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseRateLimiter();
 
 app.Run();

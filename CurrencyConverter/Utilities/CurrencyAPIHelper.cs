@@ -13,13 +13,17 @@ namespace CurrencyConverter.Utilities
         private readonly ILogger<CurrencyAPIHelper> _logger;
         private readonly ICacheHelper _cache;
         private readonly IConfiguration _config;
+        private readonly HttpClient httpClient;
         string baseUrl = string.Empty;
-        public CurrencyAPIHelper(ILogger<CurrencyAPIHelper> logger, ICacheHelper cache, IConfiguration config)
+        public CurrencyAPIHelper(ILogger<CurrencyAPIHelper> logger, ICacheHelper cache
+            , IConfiguration config, IHttpClientFactory factory)
         {
             _logger = logger;
             _cache = cache;
             _config=config;
             baseUrl = _config.GetSection("CurrencyProvider")["BaseUrl"];
+            httpClient = factory.CreateClient("ExternalApi");
+            //httpClient.BaseAddress = new Uri(baseUrl);
         }
         public async Task<CurrencyAPIModel> GetExchangeRates(string baseCurrency)
         {
@@ -30,9 +34,7 @@ namespace CurrencyConverter.Utilities
                 result = _cache.GetCacheByKey<CurrencyAPIModel>(cacheKey);
                 if(result is not null)
                     return result;
-                using (var httpClient = new HttpClient())
-                {
-                    var uri = $"{baseUrl}latest?base={baseCurrency}";
+                 var uri = $"{baseUrl}latest?base={baseCurrency}";
 
                     var response = await httpClient.GetAsync(uri);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -42,7 +44,7 @@ namespace CurrencyConverter.Utilities
                         result = JsonSerializer.Deserialize<CurrencyAPIModel>(content);
                         _cache.SetCache(cacheKey, result);
                     }
-                }
+                
                 return result;
             }
             catch (Exception ex)
@@ -61,8 +63,7 @@ namespace CurrencyConverter.Utilities
                 string cacheKey = "supportedCurrencies";
                 result = _cache.GetCacheByKey<Dictionary<string, string>> ("cacheKey");
 
-                using (var httpClient = new HttpClient())
-                {
+                
                     var uri = $"{baseUrl}currencies";
 
                     var response = await httpClient.GetAsync(uri);
@@ -73,7 +74,7 @@ namespace CurrencyConverter.Utilities
                         result = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
                         _cache.SetCache(cacheKey, result);
                     }
-                }
+                
                 return result;
             }
             catch (Exception ex)
@@ -120,8 +121,7 @@ namespace CurrencyConverter.Utilities
                     }
 
                     var uri = $"{baseUrl}{request.FromDate.ToString("yyyy-MM-dd")}..{request.ToDate.ToString("yyyy-MM-dd")}?base={request.BaseCurrency.ToUpper()}";
-                    using (var httpClient = new HttpClient())
-                    {
+                    
                         var response = await httpClient.GetAsync(uri);
                         if (response.IsSuccessStatusCode)
                         {
@@ -144,7 +144,7 @@ namespace CurrencyConverter.Utilities
 
                         }
 
-                    }
+                    
                 }
                 catch (Exception ex)
                 {
