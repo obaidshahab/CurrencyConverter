@@ -9,10 +9,23 @@ using Polly;
 using Serilog;
 using System.Text;
 using System.Net;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader =
+    new HeaderApiVersionReader("api-version");
+});
+
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
@@ -51,7 +64,14 @@ builder.Services.AddControllers(options =>
 {
 
 });
-
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracer =>
+    {
+        tracer
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter();
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -60,6 +80,7 @@ builder.Services.AddSwaggerGen();
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
+    .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -68,7 +89,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICurrencyAPIHelper, CurrencyAPIHelper>();
 builder.Services.AddSingleton<ICacheHelper, CacheHelper>();
 
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // Applly rate limit
 builder.Services.AddRateLimiter(options =>
@@ -119,13 +140,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Register global exceptions
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 app.UseRateLimiter();

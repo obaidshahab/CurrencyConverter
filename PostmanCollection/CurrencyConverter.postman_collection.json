@@ -10,6 +10,54 @@
       "name": "api",
       "item": [
         {
+          "name": "Login",
+          "item": [
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "let response = pm.response.json();\r",
+                      "\r",
+                      "pm.environment.set(\"token\", response.access_token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/Auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "Auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
           "name": "ExchangeRate",
           "item": [
             {
@@ -18,9 +66,6 @@
                 {
                   "name": "/api/ExchangeRate/GetLatestExchangeRate",
                   "request": {
-                    "auth": {
-                      "type": "noauth"
-                    },
                     "method": "GET",
                     "header": [
                       {
@@ -215,7 +260,7 @@
                     ],
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"baseCurrency\": \"INR\",\n  \"fromDate\": \"2026-01-01\",\n  \"toDate\": \"2026-02-01\",\n  \"pageNumber\": 1,\n  \"records\": 10\n}",
+                      "raw": "{\n  \"baseCurrency\": \"USD\",\n  \"fromDate\": \"2025-01-01\",\n  \"toDate\": \"2026-02-01\",\n  \"pageNumber\": 1,\n  \"records\": 10\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -278,54 +323,6 @@
                   ]
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name": "Login",
-          "item": [
-            {
-              "name": "Login",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "let response = pm.response.json();\r",
-                      "\r",
-                      "pm.environment.set(\"token\", response.access_token);"
-                    ],
-                    "type": "text/javascript",
-                    "packages": {},
-                    "requests": {}
-                  }
-                }
-              ],
-              "request": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"username\": \"admin\",\r\n  \"password\": \"123\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/Auth/login",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "Auth",
-                    "login"
-                  ]
-                }
-              },
-              "response": []
             }
           ]
         }
@@ -410,7 +407,10 @@
         "packages": {},
         "requests": {},
         "exec": [
-          ""
+          "pm.request.headers.upsert({\r",
+          "    key: \"api-version\",\r",
+          "    value: \"1.0\"\r",
+          "});"
         ]
       }
     },

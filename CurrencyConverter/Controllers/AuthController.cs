@@ -9,15 +9,15 @@ namespace CurrencyConverter.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly JwtService _jwtService;
-        private static readonly Dictionary<string, (string Password, string ClientId)> _users
+        private readonly IJwtService _jwtService;
+        private static readonly Dictionary<string, (string Password, string ClientId, string Role)> _users
         = new()
                 {
-        { "admin", ("123", "1001") },
-        { "role1", ("password123", "1002") },
-        { "role2", ("xyz123", "1003") }
+        { "admin", ("123", "1001","Admin") },
+        { "role1", ("password123", "1002","User") },
+        { "role2", ("xyz123", "1003","Viewer") }
             };  
-        public AuthController(JwtService jwtService)
+        public AuthController(IJwtService jwtService)
         {
             _jwtService = jwtService;
         }
@@ -31,7 +31,7 @@ namespace CurrencyConverter.Controllers
             if (user.Password != request.Password)
                 return Unauthorized("Invalid password");
             
-            var token = _jwtService.GenerateToken(user.ClientId, request.Username);
+            var token = _jwtService.GenerateToken(user.ClientId, request.Username, user.Role);
 
             return Ok(new
             {

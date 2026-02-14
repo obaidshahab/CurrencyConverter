@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 
 namespace CurrencyConverter.Middleware
 {
@@ -16,7 +17,7 @@ namespace CurrencyConverter.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            var sw = Stopwatch.StartNew();
+           
 
             var stopWatch = Stopwatch.StartNew();
             var ip = context.Connection.RemoteIpAddress?.ToString();
@@ -25,21 +26,34 @@ namespace CurrencyConverter.Middleware
             var clientId = context.User?.FindFirst("clientId")?.Value
                                               ?? "anonymous";
 
+            var correlationId = context.TraceIdentifier;
 
-
-            _logger.LogInformation("ClientId: {clientId}", clientId);
-            _logger.LogInformation("Incoming request from IP: {IP}", ip);
-            _logger.LogInformation("MethodType {method}", method);
-            _logger.LogInformation("Endpoint {endpoint}", endpoint);
+            //_logger.LogInformation("ClientId: {clientId}", clientId);
+            //_logger.LogInformation("Incoming request from IP: {IP}", ip);
+            //_logger.LogInformation("MethodType {method}", method);
+            //_logger.LogInformation("Endpoint {endpoint}", endpoint);
 
             await _next(context); 
             var statusCode = context.Response.StatusCode;
             stopWatch.Stop();
-            _logger.LogInformation("StatusCode {statuscode}", statusCode);
-            _logger.LogInformation("Execution Time {time}", stopWatch.ElapsedMilliseconds);
-                     
+            //_logger.LogInformation("StatusCode {statuscode}", statusCode);
+            //_logger.LogInformation("Execution Time {time}", stopWatch.ElapsedMilliseconds);
 
-           
+            _logger.LogInformation(
+            "Request completed {@log}",
+            new
+            {
+                ClientIP = ip,
+                ClientId = clientId,
+                Method = method,
+                Endpoint = endpoint,
+                StatusCode = statusCode,
+                DurationMs = stopWatch.ElapsedMilliseconds,
+                CorrelationId = correlationId
+            });
+
+
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CurrencyConverter.Models;
+﻿using Asp.Versioning;
+using CurrencyConverter.Models;
 using CurrencyConverter.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -7,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace CurrencyConverter.Controllers
 {
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     public class ExchangeRateController : ControllerBase
     {
         private readonly ILogger<ExchangeRateController> logger;
