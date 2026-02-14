@@ -98,11 +98,21 @@ namespace CurrencyConverter.Controllers
         [HttpPost("GetHistoricalExchangeRates")]
         public async Task<IActionResult> GetHistoricalExchangeRates(HistoricalExchangeRateRequestModel requestModel)
         {
+            if (requestModel is null)
+            {
+                return BadRequest("Request body is required.");
+            }
+            if (requestModel.PageNumber<=0 || requestModel.Records <= 0)
+
+            {
+                return BadRequest("Page Number and Records must be greater than 0");
+            }
+
             requestModel.BaseCurrency = requestModel.BaseCurrency.ToUpper();
             var getSupportedCurrency = await currencyAPIHelper.GetSupportedCurrencies();
             if (getSupportedCurrency.Count == 0 || !getSupportedCurrency.ContainsKey(requestModel.BaseCurrency))
             {
-                return NotFound("Currency not supported");
+                return BadRequest("Currency not supported");
             }
 
             if (requestModel.FromDate.Date > requestModel.ToDate.Date)
