@@ -63,9 +63,11 @@ namespace CurrencyConverter.Utilities
                 string cacheKey = "supportedCurrencies";
                 result = _cache.GetCacheByKey<Dictionary<string, string>> ("cacheKey");
 
-                
-                    var uri = $"{baseUrl}currencies";
 
+                var uri = $"{baseUrl}currencies";
+
+                // used the below url from a mock server to test the retry and circuit breaker policy
+                //var uri = "https://9cda1711-f0d3-44c1-b4ae-6f522e3b0fb3.mock.pstmn.io/GetSupportedCurrencies";
                     var response = await httpClient.GetAsync(uri);
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
