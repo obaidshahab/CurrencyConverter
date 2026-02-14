@@ -192,13 +192,16 @@ namespace CurrencyConverter.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task GetHistoricalExchangeRates_ReturnsNotFound_WhenCurrencyUnsupported()
+        public async Task GetHistoricalExchangeRates_ReturnsBadRequest_WhenCurrencyUnsupported()
         {
             var request = new HistoricalExchangeRateRequestModel
             {
                 BaseCurrency = "XXX",
                 FromDate = DateTime.Parse("2025-01-01"),
-                ToDate = DateTime.Parse("2025-01-02")
+                ToDate = DateTime.Parse("2025-01-02"),
+                PageNumber = 1,
+                Records=10
+
             };
 
             _helperMock.Setup(x => x.GetSupportedCurrencies())
@@ -206,7 +209,7 @@ namespace CurrencyConverter.Controllers.Tests
 
             var result = await _controller.GetHistoricalExchangeRates(request);
 
-            var notFound = result as NotFoundObjectResult;
+            var notFound = result as BadRequestObjectResult;
 
             Assert.IsNotNull(notFound);
             Assert.AreEqual("Currency not supported", notFound.Value);
