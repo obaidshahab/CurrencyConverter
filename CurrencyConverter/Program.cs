@@ -80,7 +80,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddScoped<ICurrencyAPIHelper, CurrencyAPIHelper>();
 builder.Services.AddSingleton<ICacheHelper, CacheHelper>();
 
-builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // Applly rate limit
 builder.Services.AddRateLimiter(options =>

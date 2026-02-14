@@ -9,7 +9,7 @@ namespace CurrencyConverter.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly JwtService _jwtService;
+        private readonly IJwtService _jwtService;
         private static readonly Dictionary<string, (string Password, string ClientId, string Role)> _users
         = new()
                 {
@@ -17,7 +17,7 @@ namespace CurrencyConverter.Controllers
         { "role1", ("password123", "1002","User") },
         { "role2", ("xyz123", "1003","Viewer") }
             };  
-        public AuthController(JwtService jwtService)
+        public AuthController(IJwtService jwtService)
         {
             _jwtService = jwtService;
         }
