@@ -15,18 +15,17 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+//API versioning
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.AssumeDefaultVersionWhenUnspecified = false;
     options.ReportApiVersions = true;
     options.ApiVersionReader =
     new HeaderApiVersionReader("api-version");
 });
 
-
+//jwt token section
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -64,6 +63,8 @@ builder.Services.AddControllers(options =>
 {
 
 });
+
+// Open telemetry implementation
 builder.Services.AddOpenTelemetry()
     .WithTracing(tracer =>
     {
@@ -76,14 +77,15 @@ builder.Services.AddOpenTelemetry()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Serilog
+// Add Serilog with seq
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.Seq("http://localhost:5341")
+    .WriteTo.Seq("http://localhost:1234")// Replace with log server url
     .CreateLogger();
 
 builder.Host.UseSerilog();
+// in memory caching
 builder.Services.AddMemoryCache();
 
 builder.Services.AddScoped<ICurrencyAPIHelper, CurrencyAPIHelper>();
@@ -101,6 +103,7 @@ builder.Services.AddRateLimiter(options =>
         config.QueueLimit = 10;
     });
 });
+// we have tested the below policy with mock server creation with postman
 // Add Retry Policy
 static IAsyncPolicy<HttpResponseMessage> RetryPolicy()
 {
@@ -123,7 +126,6 @@ static IAsyncPolicy<HttpResponseMessage> CircuitBreakerPolicy()
             durationOfBreak: TimeSpan.FromSeconds(30)
         );
 }
-
 builder.Services.AddHttpClient("ExternalApi", client =>
 {
         client.Timeout = TimeSpan.FromSeconds(30);
@@ -144,12 +146,13 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Register global exceptions
+// Register global exception  middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 
-app.MapControllers();
-app.UseRateLimiter();
 
+// Apply the named rate limit policy to all controller endpoints
+app.UseRateLimiter();
+app.MapControllers().RequireRateLimiting("default");
 app.Run();
