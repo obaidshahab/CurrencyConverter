@@ -9,7 +9,7 @@ JWT-based authentication.
 Currency conversion endpoint.
 Exchange rate lookup.
 Request audit logging.
-xUnit integration testing support.
+Unit integration testing support.
 Structured logging.
 Swagger API documentation.
 
