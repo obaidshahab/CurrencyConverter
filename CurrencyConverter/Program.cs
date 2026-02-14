@@ -11,6 +11,7 @@ using System.Text;
 using System.Net;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +64,14 @@ builder.Services.AddControllers(options =>
 {
 
 });
-
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracer =>
+    {
+        tracer
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter();
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -72,6 +80,7 @@ builder.Services.AddSwaggerGen();
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
+    .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -131,13 +140,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Register global exceptions
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 app.UseRateLimiter();
