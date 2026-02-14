@@ -10,7 +10,7 @@ namespace CurrencyConverter.Controllers
     [Route("api/[controller]")]
     [ApiVersion("1.0")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     public class ExchangeRateController : ControllerBase
     {
         private readonly ILogger<ExchangeRateController> logger;

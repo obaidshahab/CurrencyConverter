@@ -14,7 +14,7 @@ namespace CurrencyConverter.Utilities
             _config = config;
         }
 
-        public string GenerateToken(string userId, string username)
+        public string GenerateToken(string userId, string username,string role)
         {
             var jwt = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(
@@ -29,7 +29,8 @@ namespace CurrencyConverter.Utilities
             var claims = new[]
             {
             new Claim("clientId", userId),
-            new Claim(ClaimTypes.Name, username)
+            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.Role, role)
         };
 
             var token = new JwtSecurityToken(
