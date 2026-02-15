@@ -7,14 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyConverter.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiVersion("1.0")]
+ 
+   
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/[controller]")]
+    //[Route("api/v{version:apiVersion}/[controller]")]
+    
     [Authorize(Roles ="Admin")]
     public class ExchangeRateController : ControllerBase
     {
         private readonly ILogger<ExchangeRateController> logger;
         private readonly ICurrencyAPIHelper currencyAPIHelper;
+
+        // this list can be moved to config file or in db if we want to add more unsupported currencies in future
+
         private string[] nonSuppportedCurrencies = new string[] { "TRY", "PLN", "THB", "MXN" };
         public ExchangeRateController(ICurrencyAPIHelper _currencyAPIHelper,ILogger<ExchangeRateController> _logger) { 
             currencyAPIHelper = _currencyAPIHelper;
