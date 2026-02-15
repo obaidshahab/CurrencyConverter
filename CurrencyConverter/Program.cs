@@ -11,6 +11,7 @@ using System.Text;
 using System.Net;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +20,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApiVersioning(options =>
 {
     options.DefaultApiVersion = new ApiVersion(1, 0);
-    options.AssumeDefaultVersionWhenUnspecified = false;
+    options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
-    options.ApiVersionReader =
-    new HeaderApiVersionReader("api-version");
+    options.ApiVersionReader = new HeaderApiVersionReader("api-version");
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
 });
+
 
 //jwt token section
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -75,7 +80,36 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter JWT token like: Bearer {your token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 
 // Add Serilog with seq
 Log.Logger = new LoggerConfiguration()
