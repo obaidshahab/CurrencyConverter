@@ -209,10 +209,108 @@ namespace CurrencyConverter.Controllers.Tests
 
             var result = await _controller.GetHistoricalExchangeRates(request);
 
-            var notFound = result as BadRequestObjectResult;
+            var bad = result as BadRequestObjectResult;
 
-            Assert.IsNotNull(notFound);
-            Assert.AreEqual("Currency not supported", notFound.Value);
+            Assert.IsNotNull(bad);
+            Assert.AreEqual("Currency not supported", bad.Value);
+        }
+
+        [TestMethod]
+        public async Task GetHistoricalExchangeRates_ReturnsBadRequest_WhenRequestNull()
+        {
+            var result = await _controller.GetHistoricalExchangeRates(null);
+
+            var bad = result as BadRequestObjectResult;
+
+            Assert.IsNotNull(bad);
+            Assert.AreEqual("Request body is required", bad.Value);
+        }
+
+        [TestMethod]
+        public async Task GetHistoricalExchangeRates_ReturnsBadRequest_WhenBaseCurrencyMissing()
+        {
+            var request = new HistoricalExchangeRateRequestModel
+            {
+                BaseCurrency = "  ",
+                FromDate = DateTime.Parse("2025-01-01"),
+                ToDate = DateTime.Parse("2025-01-02")
+            };
+
+            var result = await _controller.GetHistoricalExchangeRates(request);
+
+            var bad = result as BadRequestObjectResult;
+
+            Assert.IsNotNull(bad);
+            Assert.AreEqual("BaseCurrency is required", bad.Value);
+        }
+
+        [TestMethod]
+        public async Task GetHistoricalExchangeRates_TrimsAndUppercasesBaseCurrency()
+        {
+            var request = new HistoricalExchangeRateRequestModel
+            {
+                BaseCurrency = " usd ",
+                FromDate = DateTime.Parse("2025-01-01"),
+                ToDate = DateTime.Parse("2025-01-02")
+            };
+
+            _helperMock.Setup(x => x.GetSupportedCurrencies())
+                .ReturnsAsync(SupportedCurrencies);
+
+            HistoricalExchangeRateRequestModel captured = null;
+            _helperMock.Setup(x => x.GetHistoricalExchangeRates(It.IsAny<HistoricalExchangeRateRequestModel>()))
+                .ReturnsAsync(new HistoricalExchangeRateResponseModel())
+                .Callback<HistoricalExchangeRateRequestModel>(r => captured = r);
+
+            var result = await _controller.GetHistoricalExchangeRates(request);
+
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+            Assert.IsNotNull(captured);
+            Assert.AreEqual("USD", captured.BaseCurrency);
+        }
+
+        [TestMethod]
+        public async Task GetLatestExchangeRate_UsesDefaultBaseCurrency_WhenNoParamProvided()
+        {
+            var model = new CurrencyAPIModel();
+
+            _helperMock.Setup(x => x.GetSupportedCurrencies())
+                .ReturnsAsync(SupportedCurrencies);
+
+            _helperMock.Setup(x => x.GetExchangeRates("EUR"))
+                .ReturnsAsync(model);
+
+            var result = await _controller.GetLatestExchangeRate();
+
+            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+        }
+
+        [TestMethod]
+        public async Task ConvertCurrency_ReturnsBadRequest_WhenParamsMissing()
+        {
+            var result = await _controller.ConvertCurrency(null, "USD");
+
+            var bad = result as BadRequestObjectResult;
+
+            Assert.IsNotNull(bad);
+            Assert.AreEqual("Currency not supported", bad.Value);
+        }
+
+        [TestMethod]
+        public async Task ConvertCurrency_TrimsAndUppercasesInputs()
+        {
+            _helperMock.Setup(x => x.GetSupportedCurrencies())
+                .ReturnsAsync(SupportedCurrencies);
+
+            _helperMock.Setup(x => x.CalculateExchangeRate("USD", "INR"))
+                .ReturnsAsync(83m);
+
+            var result = await _controller.ConvertCurrency(" usd ", " inr ");
+
+            var ok = result as OkObjectResult;
+
+            Assert.IsNotNull(ok);
+            Assert.AreEqual(83m, ok.Value);
         }
     }
 }

@@ -37,8 +37,16 @@ namespace CurrencyConverter.Controllers
         [HttpGet("GetLatestExchangeRate")]
         public async Task<IActionResult> GetLatestExchangeRate( string baseCurrency="EUR")
         {
+            // Normalize and validate base currency
+            baseCurrency = (baseCurrency ?? string.Empty).Trim().ToUpperInvariant();
+            if (string.IsNullOrWhiteSpace(baseCurrency))
+            {
+                return BadRequest("Currency not supported");
+            }
+
             var getSupportedCurrency = await currencyAPIHelper.GetSupportedCurrencies();
-            if (getSupportedCurrency.Count==0 || !getSupportedCurrency.ContainsKey(baseCurrency) ){ 
+            if (getSupportedCurrency.Count == 0 || !getSupportedCurrency.ContainsKey(baseCurrency))
+            {
                 return NotFound("Currency not supported");
             }
 
@@ -83,8 +91,15 @@ namespace CurrencyConverter.Controllers
         [HttpGet("ConvertCurrency")]
         public async Task<IActionResult> ConvertCurrency(string fromCurrency, string toCurrency)
         {
-            fromCurrency = fromCurrency.ToUpper();
-            toCurrency = toCurrency.ToUpper();
+            // Validate and normalize inputs
+            if (string.IsNullOrWhiteSpace(fromCurrency) || string.IsNullOrWhiteSpace(toCurrency))
+            {
+                return BadRequest("Currency not supported");
+            }
+
+            fromCurrency = fromCurrency.Trim().ToUpperInvariant();
+            toCurrency = toCurrency.Trim().ToUpperInvariant();
+
             var getSupportedCurrency = await currencyAPIHelper.GetSupportedCurrencies();
             if (getSupportedCurrency.Count == 0 || !getSupportedCurrency.ContainsKey(fromCurrency)
                 || !getSupportedCurrency.ContainsKey(toCurrency))
@@ -105,17 +120,22 @@ namespace CurrencyConverter.Controllers
         [HttpPost("GetHistoricalExchangeRates")]
         public async Task<IActionResult> GetHistoricalExchangeRates(HistoricalExchangeRateRequestModel requestModel)
         {
-            if (requestModel is null)
+            if (requestModel == null)
             {
-                return BadRequest("Request body is required.");
+                return BadRequest("Request body is required");
             }
-            if (requestModel.PageNumber<=0 || requestModel.Records <= 0)
+
+            if (string.IsNullOrWhiteSpace(requestModel.BaseCurrency))
+            {
+                return BadRequest("BaseCurrency is required");
+            }
+            if (requestModel.PageNumber <= 0 || requestModel.Records <= 0)
 
             {
                 return BadRequest("Page Number and Records must be greater than 0");
             }
-
-            requestModel.BaseCurrency = requestModel.BaseCurrency.ToUpper();
+            // Normalize currency code: trim and use invariant upper-case to avoid culture issues
+            requestModel.BaseCurrency = requestModel.BaseCurrency.Trim().ToUpperInvariant();
             var getSupportedCurrency = await currencyAPIHelper.GetSupportedCurrencies();
             if (getSupportedCurrency.Count == 0 || !getSupportedCurrency.ContainsKey(requestModel.BaseCurrency))
             {
