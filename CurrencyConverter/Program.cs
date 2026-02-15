@@ -132,9 +132,9 @@ builder.Services.AddRateLimiter(options =>
 {
     options.AddFixedWindowLimiter("default", config =>
     {
-        config.PermitLimit = 10; 
+        config.PermitLimit = 1000; 
         config.Window = TimeSpan.FromMinutes(1);
-        config.QueueLimit = 10;
+        config.QueueLimit = 100;
     });
 });
 // we have tested the below policy with mock server creation with postman
